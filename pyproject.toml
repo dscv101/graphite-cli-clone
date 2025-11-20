@@ -128,8 +128,6 @@ select = [
 ignore = [
     "D203",   # one-blank-line-before-class (conflicts with D211)
     "D213",   # multi-line-summary-second-line (conflicts with D212)
-    "ANN101", # missing-type-self (deprecated)
-    "ANN102", # missing-type-cls (deprecated)
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -140,6 +138,9 @@ convention = "google"
     "S101",   # allow assert in tests
     "ANN",    # don't require type annotations in tests
     "D",      # don't require docstrings in tests
+]
+"src/graphite_cli/exceptions/base.py" = [
+    "N818",   # Exception naming follows Graphite prefix pattern
 ]
 
 # Pyright configuration (strict mode, Python 3.11+)

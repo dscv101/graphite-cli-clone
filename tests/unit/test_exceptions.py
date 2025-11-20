@@ -75,20 +75,22 @@ def test_authentication_exception() -> None:
 
 def test_exceptions_are_raisable() -> None:
     """Test all exceptions can be raised and caught."""
+    msg = "Test"
+    branch_name = "branch"
     with pytest.raises(GraphiteException):
-        raise GraphiteException("Test")
+        raise GraphiteException(msg)
 
     with pytest.raises(GitException):
-        raise GitException("Test")
+        raise GitException(msg)
 
     with pytest.raises(GitHubException):
-        raise GitHubException("Test")
+        raise GitHubException(msg)
 
     with pytest.raises(ValidationException):
-        raise ValidationException("Test")
+        raise ValidationException(msg)
 
     with pytest.raises(ConflictException):
-        raise ConflictException("branch", ["file.py"])
+        raise ConflictException(branch_name, ["file.py"])
 
     with pytest.raises(AuthenticationException):
-        raise AuthenticationException()
+        raise AuthenticationException

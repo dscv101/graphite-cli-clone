@@ -1,6 +1,5 @@
 """Main CLI application entry point."""
 
-
 import typer
 
 from graphite_cli import __version__
