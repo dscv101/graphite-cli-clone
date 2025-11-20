@@ -85,6 +85,9 @@ def setup_logging(
     logger.propagate = propagate
 
     # Remove existing handlers to avoid duplicates
+    # Close file handlers properly to prevent permission errors on Windows/macOS
+    for handler in logger.handlers[:]:
+        handler.close()
     logger.handlers.clear()
 
     # Add sensitive data filter
