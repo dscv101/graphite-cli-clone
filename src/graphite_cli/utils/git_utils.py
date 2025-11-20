@@ -7,6 +7,7 @@ validation, and repository state checks.
 
 import re
 from pathlib import Path
+from typing import NoReturn
 
 from git import Commit, InvalidGitRepositoryError, Repo
 from git.exc import BadName, GitCommandError
@@ -119,7 +120,7 @@ def parse_ref(repo: Repo, ref_string: str) -> Commit | None:
         return None
 
 
-def _raise_ref_not_found_error(ref_string: str) -> None:
+def _raise_ref_not_found_error(ref_string: str) -> NoReturn:
     """Helper function to raise ref not found error."""
     msg = f"Could not resolve ref: '{ref_string}'"
     raise GitException(
