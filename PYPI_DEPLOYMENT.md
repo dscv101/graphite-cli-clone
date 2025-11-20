@@ -315,7 +315,8 @@ pip install hatchling
 ```bash
 # Solution: Wait a few minutes for PyPI to index
 # Or check if package name is correct
-pip search graphite-cli
+pip index versions graphite-cli
+# or visit https://pypi.org/project/graphite-cli/ directly
 ```
 
 **Issue**: Dependency conflicts
