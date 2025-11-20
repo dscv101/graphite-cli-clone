@@ -120,7 +120,7 @@ class TestSetupLogging:
             assert log_file.exists()
             content = log_file.read_text()
             assert "Test message" in content
-            
+
             # Clean up handlers before temp directory cleanup
             cleanup_logging_handlers()
 
@@ -134,7 +134,7 @@ class TestSetupLogging:
 
             assert log_file.exists()
             assert log_file.parent.exists()
-            
+
             # Clean up handlers before temp directory cleanup
             cleanup_logging_handlers()
 
@@ -158,7 +158,7 @@ class TestSetupLogging:
             content = log_file.read_text()
             assert "token: [REDACTED]" in content
             assert "abc123" not in content
-            
+
             # Clean up handlers before temp directory cleanup
             cleanup_logging_handlers()
 
@@ -338,7 +338,7 @@ class TestIntegration:
             assert "Warning message" in content
             assert "test" in content
             assert "Test error" in content
-            
+
             # Clean up handlers before temp directory cleanup
             cleanup_logging_handlers()
 
@@ -359,6 +359,6 @@ class TestIntegration:
             assert "abc123def456" not in content
             assert "secret789" not in content
             assert "[REDACTED]" in content
-            
+
             # Clean up handlers before temp directory cleanup
             cleanup_logging_handlers()
