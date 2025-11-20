@@ -6,12 +6,23 @@ and timestamps.
 """
 
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import Protocol
 
 from pydantic import BaseModel, Field, field_validator
 
-if TYPE_CHECKING:
-    from graphite_cli.models.stack import Stack
+
+class StackProtocol(Protocol):
+    """Protocol defining the interface that Stack objects must implement.
+
+    This allows the Branch class to work with Stack objects without
+    importing the actual Stack class, avoiding circular imports.
+    """
+
+    branches: list["Branch"]
+
+    def get_branch(self, name: str) -> "Branch | None":
+        """Get a branch by name."""
+        ...
 
 
 class Branch(BaseModel):
@@ -87,7 +98,7 @@ class Branch(BaseModel):
         """
         return self.pr_number is not None
 
-    def get_children(self, stack: "Stack") -> list["Branch"]:
+    def get_children(self, stack: StackProtocol) -> list["Branch"]:
         """Get all child branches in stack.
 
         Args:
@@ -98,7 +109,7 @@ class Branch(BaseModel):
         """
         return [b for b in stack.branches if b.parent_branch == self.name]
 
-    def get_ancestors(self, stack: "Stack") -> list["Branch"]:
+    def get_ancestors(self, stack: StackProtocol) -> list["Branch"]:
         """Get all ancestor branches up to trunk.
 
         Args:
