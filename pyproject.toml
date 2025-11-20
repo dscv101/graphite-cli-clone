@@ -138,6 +138,8 @@ convention = "google"
     "S101",   # allow assert in tests
     "ANN",    # don't require type annotations in tests
     "D",      # don't require docstrings in tests
+    "TRY",    # allow exceptions in tests
+    "EM",     # allow string literals in exceptions in tests
 ]
 "src/graphite_cli/exceptions/base.py" = [
     "N818",   # Exception naming follows Graphite prefix pattern
