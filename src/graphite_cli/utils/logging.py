@@ -123,7 +123,7 @@ def setup_logging(
         log_file_path = Path(log_file).expanduser()
         log_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
+        file_handler = logging.FileHandler(log_file_path, encoding="utf-8", mode="a")
         file_handler.setLevel(level)
         file_formatter = logging.Formatter(
             fmt="%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s",
