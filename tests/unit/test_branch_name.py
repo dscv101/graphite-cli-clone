@@ -1,18 +1,24 @@
 """Unit tests for branch_name module."""
 
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
 
 from graphite_cli.utils.branch_name import (
+    _clean_branch_name,
+    _sanitize_branch_component,
     format_branch_description,
     generate_branch_name,
     parse_template,
     validate_branch_name,
     validate_template,
 )
+
+# Constants for test values
+MAX_LENGTH_20 = 20
+MAX_LENGTH_10 = 10
 
 
 class TestGenerateBranchName:
@@ -22,7 +28,7 @@ class TestGenerateBranchName:
     @patch("graphite_cli.utils.branch_name.datetime")
     def test_generate_with_all_placeholders(self, mock_datetime):
         """Test generating branch name with all placeholders."""
-        mock_datetime.now.return_value = datetime(2024, 1, 15, 10, 30)
+        mock_datetime.now.return_value = datetime(2024, 1, 15, 10, 30, tzinfo=UTC)
 
         result = generate_branch_name(
             "Fix Login Bug",
@@ -47,7 +53,7 @@ class TestGenerateBranchName:
     @patch("graphite_cli.utils.branch_name.datetime")
     def test_generate_with_custom_date_format(self, mock_datetime):
         """Test generating branch name with custom date format."""
-        mock_datetime.now.return_value = datetime(2024, 3, 5, 14, 20)
+        mock_datetime.now.return_value = datetime(2024, 3, 5, 14, 20, tzinfo=UTC)
 
         result = generate_branch_name(
             "new feature",
@@ -189,7 +195,7 @@ class TestValidateBranchName:
 
     def test_validate_rejects_at_brace(self):
         """Test that '@{' pattern is rejected."""
-        with pytest.raises(ValueError, match="cannot contain '@{'"):
+        with pytest.raises(ValueError, match=r"cannot contain '@\{'"):
             validate_branch_name("branch@{name}")
 
     def test_validate_rejects_special_characters(self):
@@ -207,7 +213,7 @@ class TestValidateBranchName:
 
     def test_validate_rejects_period(self):
         """Test that '.' as name is rejected."""
-        with pytest.raises(ValueError, match="cannot be '.'"):
+        with pytest.raises(ValueError, match=r"cannot be '\.'"):
             validate_branch_name(".")
 
     def test_validate_rejects_component_starting_with_period(self):
@@ -227,9 +233,9 @@ class TestFormatBranchDescription:
     def test_format_truncates_long_description(self):
         """Test that long descriptions are truncated."""
         long_desc = "This is a very long description that exceeds the maximum length"
-        result = format_branch_description(long_desc, max_length=20)
+        result = format_branch_description(long_desc, max_length=MAX_LENGTH_20)
 
-        assert len(result) <= 20
+        assert len(result) <= MAX_LENGTH_20
         assert not result.endswith("-")
 
     def test_format_truncates_at_hyphen(self):
@@ -244,9 +250,9 @@ class TestFormatBranchDescription:
     def test_format_handles_no_hyphens(self):
         """Test truncation when no hyphens available."""
         desc = "verylongdescriptionwithnohyphens"
-        result = format_branch_description(desc, max_length=10)
+        result = format_branch_description(desc, max_length=MAX_LENGTH_10)
 
-        assert len(result) == 10
+        assert len(result) == MAX_LENGTH_10
         assert result == "verylongde"
 
     def test_format_removes_trailing_hyphen(self):
@@ -318,7 +324,7 @@ class TestValidateTemplate:
 
     def test_validate_rejects_multiple_invalid_placeholders(self):
         """Test that multiple invalid placeholders are reported."""
-        with pytest.raises(ValueError, match="invalid1.*invalid2"):
+        with pytest.raises(ValueError, match=r"invalid1.*invalid2"):
             validate_template("{invalid1}/{invalid2}/{description}")
 
     def test_validate_accepts_mixed_valid_invalid(self):
@@ -332,57 +338,41 @@ class TestSanitizeBranchComponent:
 
     def test_sanitize_converts_to_lowercase(self):
         """Test that uppercase is converted to lowercase."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("UPPERCASE")
         assert result == "uppercase"
 
     def test_sanitize_replaces_spaces_with_hyphens(self):
         """Test that spaces are replaced with hyphens."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("hello world")
         assert result == "hello-world"
 
     def test_sanitize_replaces_underscores_with_hyphens(self):
         """Test that underscores are replaced with hyphens."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("hello_world")
         assert result == "hello-world"
 
     def test_sanitize_removes_special_characters(self):
         """Test that special characters are removed."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("test!@#$%name")
         assert result == "testname"
 
     def test_sanitize_preserves_slashes(self):
         """Test that slashes are preserved."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("feature/bugfix")
         assert result == "feature/bugfix"
 
     def test_sanitize_removes_consecutive_hyphens(self):
         """Test that consecutive hyphens are collapsed."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("test---name")
         assert result == "test-name"
 
     def test_sanitize_strips_leading_trailing_hyphens(self):
         """Test that leading/trailing hyphens are removed."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("-test-name-")
         assert result == "test-name"
 
     def test_sanitize_handles_empty_string(self):
         """Test that empty string returns empty string."""
-        from graphite_cli.utils.branch_name import _sanitize_branch_component
-
         result = _sanitize_branch_component("")
         assert result == ""
 
@@ -392,28 +382,20 @@ class TestCleanBranchName:
 
     def test_clean_removes_consecutive_hyphens(self):
         """Test that consecutive hyphens are removed."""
-        from graphite_cli.utils.branch_name import _clean_branch_name
-
         result = _clean_branch_name("test--branch---name")
         assert result == "test-branch-name"
 
     def test_clean_strips_leading_trailing_chars(self):
         """Test that leading/trailing hyphens and slashes are removed."""
-        from graphite_cli.utils.branch_name import _clean_branch_name
-
         result = _clean_branch_name("-/test/branch/-")
         assert result == "test/branch"
 
     def test_clean_removes_component_periods(self):
         """Test that leading/trailing periods in components are removed."""
-        from graphite_cli.utils.branch_name import _clean_branch_name
-
         result = _clean_branch_name("feature/.hidden/..test..")
         assert result == "feature/hidden/test"
 
     def test_clean_handles_empty_result(self):
         """Test handling of string that becomes empty after cleaning."""
-        from graphite_cli.utils.branch_name import _clean_branch_name
-
         result = _clean_branch_name("---///...")
         assert result == ""
