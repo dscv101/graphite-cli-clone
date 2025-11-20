@@ -135,9 +135,10 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
-    "S101",   # allow assert in tests
-    "ANN",    # don't require type annotations in tests
-    "D",      # don't require docstrings in tests
+    "S101",    # allow assert in tests
+    "ANN",     # don't require type annotations in tests
+    "D",       # don't require docstrings in tests
+    "PLR2004", # allow magic values in tests
 ]
 "src/graphite_cli/exceptions/base.py" = [
     "N818",   # Exception naming follows Graphite prefix pattern
