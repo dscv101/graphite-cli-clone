@@ -93,4 +93,4 @@ def test_exceptions_are_raisable() -> None:
         raise ConflictException(branch_name, ["file.py"])
 
     with pytest.raises(AuthenticationException):
-        raise AuthenticationException
+        raise AuthenticationException()  # Fixed: ensure parentheses for instantiation
