@@ -2,6 +2,7 @@
 
 import logging
 import tempfile
+import time
 from pathlib import Path
 
 from graphite_cli.utils import (
@@ -16,6 +17,17 @@ from graphite_cli.utils import (
     setup_logging,
 )
 from graphite_cli.utils.logging import SensitiveDataFilter
+
+
+def cleanup_logging_handlers():
+    """Clean up all logging handlers to prevent file handle leaks on Windows."""
+    logger = logging.getLogger("graphite_cli")
+    for handler in logger.handlers[:]:
+        handler.flush()
+        handler.close()
+    logger.handlers.clear()
+    # Small delay to ensure file handles are released on Windows
+    time.sleep(0.1)
 
 
 class TestSensitiveDataFilter:
@@ -108,6 +120,9 @@ class TestSetupLogging:
             assert log_file.exists()
             content = log_file.read_text()
             assert "Test message" in content
+            
+            # Clean up handlers before temp directory cleanup
+            cleanup_logging_handlers()
 
     def test_setup_logging_creates_log_directory(self):
         """Test that log directory is created if it doesn't exist."""
@@ -119,6 +134,9 @@ class TestSetupLogging:
 
             assert log_file.exists()
             assert log_file.parent.exists()
+            
+            # Clean up handlers before temp directory cleanup
+            cleanup_logging_handlers()
 
     def test_setup_logging_without_rich(self):
         """Test logging setup with Rich handler disabled."""
@@ -140,6 +158,9 @@ class TestSetupLogging:
             content = log_file.read_text()
             assert "token: [REDACTED]" in content
             assert "abc123" not in content
+            
+            # Clean up handlers before temp directory cleanup
+            cleanup_logging_handlers()
 
     def test_setup_logging_removes_existing_handlers(self):
         """Test that existing handlers are removed before adding new ones."""
@@ -317,6 +338,9 @@ class TestIntegration:
             assert "Warning message" in content
             assert "test" in content
             assert "Test error" in content
+            
+            # Clean up handlers before temp directory cleanup
+            cleanup_logging_handlers()
 
     def test_sensitive_data_never_logged(self):
         """Test that sensitive data is never written to logs."""
@@ -335,3 +359,6 @@ class TestIntegration:
             assert "abc123def456" not in content
             assert "secret789" not in content
             assert "[REDACTED]" in content
+            
+            # Clean up handlers before temp directory cleanup
+            cleanup_logging_handlers()
