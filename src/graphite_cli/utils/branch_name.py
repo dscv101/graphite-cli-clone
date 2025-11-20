@@ -107,7 +107,6 @@ def _sanitize_branch_component(component: str) -> str:
     return component.strip("-")
 
 
-
 def _clean_branch_name(branch_name: str) -> str:
     """Clean up a generated branch name.
 
@@ -130,7 +129,6 @@ def _clean_branch_name(branch_name: str) -> str:
     parts = branch_name.split("/")
     parts = [p.strip(".") for p in parts if p.strip(".")]
     return "/".join(parts)
-
 
 
 def validate_branch_name(name: str) -> None:
