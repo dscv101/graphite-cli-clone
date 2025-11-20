@@ -1,0 +1,28 @@
+# Include important documentation files
+include README.md
+include LICENSE
+include CLAUDE.md
+include AGENTS.md
+
+# Include project documentation
+include requirements.md
+include design.md
+include task_dag.md
+
+# Include test files (for sdist only, not wheel)
+recursive-include tests *.py
+
+# Include type stubs if any
+recursive-include src *.pyi py.typed
+
+# Exclude unnecessary files
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so
+global-exclude .DS_Store
+exclude .gitignore
+exclude .github
+exclude coverage.xml
+prune .github
+
