@@ -119,6 +119,15 @@ def parse_ref(repo: Repo, ref_string: str) -> Commit | None:
         return None
 
 
+def _raise_ref_not_found_error(ref_string: str) -> None:
+    """Helper function to raise ref not found error."""
+    msg = f"Could not resolve ref: '{ref_string}'"
+    raise GitException(
+        msg,
+        hint="Ensure the branch, tag, or commit exists in the repository.",
+    )
+
+
 def resolve_ref(repo: Repo, ref_string: str) -> str:
     """Resolve a ref string to its full ref name.
 
@@ -161,11 +170,7 @@ def resolve_ref(repo: Repo, ref_string: str) -> str:
         if commit:
             return commit.hexsha
 
-        msg = f"Could not resolve ref: '{ref_string}'"
-        raise GitException(
-            msg,
-            hint="Ensure the branch, tag, or commit exists in the repository.",
-        )
+        _raise_ref_not_found_error(ref_string)
     except Exception as e:
         if isinstance(e, GitException):
             raise
@@ -217,9 +222,10 @@ def get_branch_upstream(repo: Repo, branch_name: str) -> str | None:
             return None
         branch = repo.branches[branch_name]
         tracking_branch = branch.tracking_branch()
-        return tracking_branch.name if tracking_branch else None
     except (IndexError, GitCommandError, KeyError):
         return None
+    else:
+        return tracking_branch.name if tracking_branch else None
 
 
 def is_branch_merged(repo: Repo, branch: str, into_branch: str) -> bool:
@@ -366,9 +372,10 @@ def get_current_branch_name(repo: Repo) -> str | None:
     try:
         if repo.head.is_detached:
             return None
-        return repo.active_branch.name
     except (GitCommandError, TypeError):
         return None
+    else:
+        return repo.active_branch.name
 
 
 def is_detached_head(repo: Repo) -> bool:
@@ -440,9 +447,10 @@ def is_git_repo(path: Path | None = None) -> bool:
     try:
         search_path = path or Path.cwd()
         Repo(search_path, search_parent_directories=True)
-        return True
     except InvalidGitRepositoryError:
         return False
+    else:
+        return True
 
 
 def get_commit_count_between(repo: Repo, base_ref: str, head_ref: str) -> int:
