@@ -2,6 +2,12 @@
 
 This module provides structured logging with multiple handlers, log levels,
 and automatic redaction of sensitive information.
+
+Features:
+- Automatic sensitive data redaction
+- Rich console formatting support  
+- File logging with directory creation
+- Configurable log levels and handlers
 """
 
 import logging
