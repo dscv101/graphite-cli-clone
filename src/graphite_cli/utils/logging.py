@@ -5,7 +5,7 @@ and automatic redaction of sensitive information.
 
 Features:
 - Automatic sensitive data redaction
-- Rich console formatting support  
+- Rich console formatting support
 - File logging with directory creation
 - Configurable log levels and handlers
 """
