@@ -465,7 +465,12 @@ def stack_manager(mock_git_service, mock_state_manager):
 def test_restack_branch_success(stack_manager, mock_git_service):
     """Test successful branch restack."""
     # Arrange
-    branch = Branch(name="feature", parent="main", commit_sha="abc123")
+    branch = Branch(
+        name="feature",
+        parent="main",
+        commit_sha="abc123",
+        created_at="2024-01-15T10:30:00Z"
+    )
     mock_git_service.rebase.return_value = True
     
     # Act
@@ -478,7 +483,12 @@ def test_restack_branch_success(stack_manager, mock_git_service):
 def test_restack_branch_conflict(stack_manager, mock_git_service):
     """Test restack with merge conflicts."""
     # Arrange
-    branch = Branch(name="feature", parent="main", commit_sha="abc123")
+    branch = Branch(
+        name="feature",
+        parent="main",
+        commit_sha="abc123",
+        created_at="2024-01-15T10:30:00Z"
+    )
     mock_git_service.rebase.side_effect = GraphiteRebaseError("Conflict")
     
     # Act & Assert
