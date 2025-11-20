@@ -1,0 +1,224 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "graphite-cli"
+version = "0.1.0"
+description = "A Python-based Git workflow tool that simplifies PR stacking for software development teams"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Graphite CLI Team", email = "team@graphite-cli.dev"},
+]
+keywords = ["git", "github", "cli", "workflow", "pr-stack", "pull-request"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "gitpython>=3.1.40",
+    "pygithub>=2.1.1",
+    "keyring>=24.3.0",
+    "pydantic>=2.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.6",
+    "pyright>=1.1.338",
+    "bandit>=1.7.5",
+]
+
+[project.scripts]
+gt = "graphite_cli.cli.app:main"
+
+[project.urls]
+Homepage = "https://github.com/graphite-cli/graphite-cli"
+Documentation = "https://github.com/graphite-cli/graphite-cli#readme"
+Repository = "https://github.com/graphite-cli/graphite-cli"
+Issues = "https://github.com/graphite-cli/graphite-cli/issues"
+
+# Hatch configuration
+[tool.hatch.build]
+directory = "dist"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/graphite_cli"]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.6",
+    "pyright>=1.1.338",
+    "bandit>=1.7.5",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "pytest --cov=graphite_cli --cov-report=term-missing --cov-report=html {args:tests}"
+lint = "ruff check src tests"
+format = "ruff format src tests"
+format-check = "ruff format --check src tests"
+type-check = "pyright src"
+security = "bandit -r src -ll"
+check-all = ["format-check", "lint", "type-check", "security", "test-cov"]
+
+# Ruff configuration (Google Python Style Guide, 100 char line length)
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "D",      # pydocstyle (Google style docstrings)
+    "UP",     # pyupgrade
+    "ANN",    # flake8-annotations
+    "ASYNC",  # flake8-async
+    "S",      # flake8-bandit (security)
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "C4",     # flake8-comprehensions
+    "DTZ",    # flake8-datetimez
+    "T10",    # flake8-debugger
+    "EM",     # flake8-errmsg
+    "ISC",    # flake8-implicit-str-concat
+    "ICN",    # flake8-import-conventions
+    "G",      # flake8-logging-format
+    "PIE",    # flake8-pie
+    "T20",    # flake8-print
+    "PT",     # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RSE",    # flake8-raise
+    "RET",    # flake8-return
+    "SLF",    # flake8-self
+    "SIM",    # flake8-simplify
+    "TID",    # flake8-tidy-imports
+    "TCH",    # flake8-type-checking
+    "ARG",    # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate (commented-out code)
+    "PL",     # Pylint
+    "TRY",    # tryceratops
+    "FLY",    # flynt
+    "PERF",   # Perflint
+    "RUF",    # Ruff-specific rules
+]
+ignore = [
+    "D203",   # one-blank-line-before-class (conflicts with D211)
+    "D213",   # multi-line-summary-second-line (conflicts with D212)
+    "ANN101", # missing-type-self (deprecated)
+    "ANN102", # missing-type-cls (deprecated)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",   # allow assert in tests
+    "ANN",    # don't require type annotations in tests
+    "D",      # don't require docstrings in tests
+]
+
+# Pyright configuration (strict mode, Python 3.11+)
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+include = ["src"]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    ".git",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+]
+reportMissingTypeStubs = false
+reportImportCycles = true
+reportUnusedImport = true
+reportUnusedClass = true
+reportUnusedFunction = true
+reportUnusedVariable = true
+reportDuplicateImport = true
+reportPrivateUsage = true
+reportConstantRedefinition = true
+reportIncompatibleMethodOverride = true
+reportIncompatibleVariableOverride = true
+reportUnnecessaryIsInstance = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.4"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--color=yes",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "e2e: marks tests as end-to-end tests",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "@overload",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+# Bandit configuration
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv"]
+skips = ["B101"]  # assert_used (allowed in tests via per-file-ignores)
