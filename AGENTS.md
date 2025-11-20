@@ -779,8 +779,8 @@ def create_branch(name: str) -> Branch:
     """Create a new branch with validation."""
     if not name or name.startswith("-"):
         raise GraphiteValidationError(f"Invalid branch name: {name}")
-    if ".." in name or "/" not in name:
-        raise GraphiteValidationError(f"Invalid branch name format: {name}")
+    if ".." in name:
+        raise GraphiteValidationError(f"Path traversal detected in branch name: {name}")
     return Branch(name=name, ...)
 ```
 
@@ -815,4 +815,3 @@ def create_branch(name: str) -> Branch:
 
 **Last Updated**: 2025-11-20  
 **Version**: 1.0
-
